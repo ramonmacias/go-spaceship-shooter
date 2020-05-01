@@ -15,7 +15,7 @@ const (
 // GetMapElements goes through the game map, and return a description of each
 // map element and his position
 func (e *Engine) GetMapElements() map[MapElement][]Point {
-	center := e.getCenterCoordinate()
+	center := e.getMapCenter()
 	elements := make(map[MapElement][]Point, 0)
 	for mapY, row := range e.gameMap {
 		for mapX, col := range row {
@@ -41,10 +41,10 @@ func (e *Engine) getMapDimensions() (int, int) {
 	if len(e.gameMap) == 0 {
 		return 0, 0
 	}
-	return len(e.gameMap), len(e.gameMap[0])
+	return len(e.gameMap[0]), len(e.gameMap)
 }
 
-func (e *Engine) getCenterCoordinate() (c Point) {
+func (e *Engine) getMapCenter() (c Point) {
 	width, height := e.getMapDimensions()
 	return Point{
 		X: width / 2,
