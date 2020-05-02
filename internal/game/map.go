@@ -1,5 +1,8 @@
 package game
 
+// Map is a matrix representation of game map
+type Map [][]rune
+
 // MapElement describes which kind of object are inside a specific position
 type MapElement int
 
@@ -14,10 +17,10 @@ const (
 
 // GetMapElements goes through the game map, and return a description of each
 // map element and his position
-func (e *Engine) GetMapElements() map[MapElement][]Point {
-	center := e.getMapCenter()
+func (m Map) GetMapElements() map[MapElement][]Point {
+	center := m.getMapCenter()
 	elements := make(map[MapElement][]Point, 0)
-	for mapY, row := range e.gameMap {
+	for mapY, row := range m {
 		for mapX, col := range row {
 			mapElement := MapElementNone
 			switch col {
@@ -37,15 +40,15 @@ func (e *Engine) GetMapElements() map[MapElement][]Point {
 
 // getMapDimensions will get the dimensions of the current map, in the form
 // width + height
-func (e *Engine) getMapDimensions() (int, int) {
-	if len(e.gameMap) == 0 {
+func (m Map) getMapDimensions() (int, int) {
+	if len(m) == 0 {
 		return 0, 0
 	}
-	return len(e.gameMap[0]), len(e.gameMap)
+	return len(m[0]), len(m)
 }
 
-func (e *Engine) getMapCenter() (c Point) {
-	width, height := e.getMapDimensions()
+func (m Map) getMapCenter() (c Point) {
+	width, height := m.getMapDimensions()
 	return Point{
 		X: width / 2,
 		Y: height / 2,

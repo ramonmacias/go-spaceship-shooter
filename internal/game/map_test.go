@@ -29,7 +29,7 @@ var (
 func TestGetDimensionsMapMethod(t *testing.T) {
 	tests := []struct {
 		name           string
-		gameMap        [][]rune
+		gameMap        Map
 		expectedWidth  int
 		expectedHeight int
 	}{
@@ -54,10 +54,7 @@ func TestGetDimensionsMapMethod(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := Engine{
-				gameMap: tt.gameMap,
-			}
-			width, height := e.getMapDimensions()
+			width, height := tt.gameMap.getMapDimensions()
 			assert.Equal(t, tt.expectedWidth, width)
 			assert.Equal(t, tt.expectedHeight, height)
 		})
@@ -67,7 +64,7 @@ func TestGetDimensionsMapMethod(t *testing.T) {
 func TestGetMapCenterMethod(t *testing.T) {
 	tests := []struct {
 		name     string
-		gameMap  [][]rune
+		gameMap  Map
 		expected Point
 	}{
 		{
@@ -97,10 +94,7 @@ func TestGetMapCenterMethod(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := Engine{
-				gameMap: tt.gameMap,
-			}
-			center := e.getMapCenter()
+			center := tt.gameMap.getMapCenter()
 			assert.Equal(t, tt.expected, center)
 		})
 	}
