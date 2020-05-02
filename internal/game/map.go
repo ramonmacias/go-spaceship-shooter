@@ -16,7 +16,8 @@ const (
 )
 
 // GetMapElements goes through the game map, and return a description of each
-// map element and his position
+// map element and his position, seems we are doing distances and not coordinates
+// TODO check this coordinat/position
 func (m Map) GetMapElements() map[MapElement][]Point {
 	center := m.getMapCenter()
 	elements := make(map[MapElement][]Point, 0)
