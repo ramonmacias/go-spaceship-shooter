@@ -10,7 +10,7 @@ import (
 // Engine type will keep all the main information related with the game
 type Engine struct {
 	Entities        map[uuid.UUID]Identifier
-	gameMap         Map
+	GameMap         Map
 	Mu              sync.RWMutex
 	ChangeChan      chan Change
 	ActionChan      chan Action
