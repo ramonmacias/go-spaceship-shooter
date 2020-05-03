@@ -9,7 +9,10 @@ import (
 
 // Engine type will keep all the main information related with the game
 type Engine struct {
-	Entities        map[uuid.UUID]Identifier
+	// Actors keep the information and link about all the interactors of the
+	// game
+	Actors map[uuid.UUID]Actor
+	// GameMap keep link to the current map is playing
 	GameMap         Map
 	Mu              sync.RWMutex
 	ChangeChan      chan Change
@@ -23,9 +26,29 @@ type Engine struct {
 	spawnPointIndex int
 }
 
-// Action interface should be implemented for each of the possible actions a
-type Action interface {
-	Perform(e Engine)
+// Start will setup the basics for run the game
+func (e *Engine) Start() {
+	go e.actionsListener()
+}
+
+// actionsListener will be listening for all the events received from the action
+// channel and will apply them
+func (e *Engine) actionsListener() {
+	for {
+		action := <-e.ActionChan
+		e.Mu.Lock()
+		action.Perform(e)
+		e.Mu.Unlock()
+	}
+}
+
+// Actor defines all the different entities that has the feature of change the
+// behaviour of the game status
+// TODO pending to move this as an interface when we have bots
+type Actor struct {
+	ID       uuid.UUID
+	Name     string
+	Position Point
 }
 
 // Identifier is an entity that provides an ID method.
@@ -36,26 +59,6 @@ type Identifier interface {
 // Change is sent by the game engine in response to Actions.
 // TODO review this part
 type Change interface{}
-
-// Direction is used to represent Direction constants.
-type Direction int
-
-// Contains direction constants - DirectionStop will take no effect.
-const (
-	DirectionUp Direction = iota
-	DirectionDown
-	DirectionLeft
-	DirectionRight
-	DirectionStop
-)
-
-// MoveAction keep the information about the actions launched by the user, such
-// as arrow keys pressed
-type MoveAction struct {
-	Direction Direction
-	ID        uuid.UUID
-	CreatedAt time.Time
-}
 
 // MoveChange this is a result change from an user action
 type MoveChange struct {

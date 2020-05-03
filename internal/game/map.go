@@ -39,6 +39,16 @@ func (m Map) GetMapElements() map[MapElement][]Point {
 	return elements
 }
 
+// IsWall will check if on the given position exists a wall
+func (m Map) IsWall(p Point) bool {
+	for _, position := range m.GetMapElements()[MapElementWall] {
+		if position == p {
+			return true
+		}
+	}
+	return false
+}
+
 // getMapDimensions will get the dimensions of the current map, in the form
 // width + height
 func (m Map) getMapDimensions() (int, int) {

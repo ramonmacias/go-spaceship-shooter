@@ -212,3 +212,15 @@ func TestPositionsGetMapElementsMethod(t *testing.T) {
 	}
 	assert.Equal(t, expected, gameMap.GetMapElements())
 }
+
+func TestIsWallMethod(t *testing.T) {
+	tests := []struct{
+		name string
+		gameMap Map
+		expected bool
+	}{
+		{
+
+		}
+	}
+}
