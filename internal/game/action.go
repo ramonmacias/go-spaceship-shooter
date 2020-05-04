@@ -37,16 +37,16 @@ func (m *MoveAction) Perform(e *Engine) {
 	actor := e.Actors[m.ActorID]
 	switch m.Direction {
 	case DirectionUp:
-		actor.Position.Y++
-	case DirectionDown:
 		actor.Position.Y--
+	case DirectionDown:
+		actor.Position.Y++
 	case DirectionRight:
-		actor.Position.X++
-	case DirectionLeft:
 		actor.Position.X--
+	case DirectionLeft:
+		actor.Position.X++
 	}
 	// Check if we collide with a wall
-	if !e.GameMap.IsWall(actor.Position) {
+	if e.GameMap.IsWall(actor.Position) {
 		return
 	}
 	e.Actors[m.ActorID] = actor
