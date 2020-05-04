@@ -42,7 +42,7 @@ func (m Map) GetMapElements() map[MapElement][]Point {
 // IsWall will check if on the given position exists a wall
 func (m Map) IsWall(p Point) bool {
 	for _, position := range m.GetMapElements()[MapElementWall] {
-		if position == p {
+		if position.Equal(p) {
 			return true
 		}
 	}

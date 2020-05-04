@@ -214,13 +214,34 @@ func TestPositionsGetMapElementsMethod(t *testing.T) {
 }
 
 func TestIsWallMethod(t *testing.T) {
-	tests := []struct{
-		name string
-		gameMap Map
+	tests := []struct {
+		name     string
+		gameMap  Map
+		position Point
 		expected bool
 	}{
 		{
-
-		}
+			name:    "Shouldn't find a wall on this position",
+			gameMap: mapTest1,
+			position: Point{
+				X: 1,
+				Y: 1,
+			},
+			expected: false,
+		},
+		{
+			name:    "Should find a wall on this position",
+			gameMap: mapTest1,
+			position: Point{
+				X: 0,
+				Y: 0,
+			},
+			expected: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, tt.gameMap.IsWall(tt.position))
+		})
 	}
 }
