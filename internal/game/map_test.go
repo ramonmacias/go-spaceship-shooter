@@ -150,69 +150,6 @@ func TestSizesGetMapElementsMethod(t *testing.T) {
 	}
 }
 
-// Decided to just test the small due the amount of lines that requires to build all
-// the scenario, need to check those positions
-func TestPositionsGetMapElementsMethod(t *testing.T) {
-	gameMap := Map(mapTest3)
-	expected := map[MapElement][]Point{
-		MapElementNone: []Point{
-			{
-				X: 1,
-				Y: 2,
-			},
-		},
-		MapElementWall: []Point{
-			{
-				X: 0,
-				Y: 0,
-			},
-			{
-				X: 0,
-				Y: 1,
-			},
-			{
-				X: 0,
-				Y: 2,
-			},
-			{
-				X: 1,
-				Y: 0,
-			},
-			{
-				X: 1,
-				Y: 2,
-			},
-			{
-				X: 2,
-				Y: 0,
-			},
-			{
-				X: 2,
-				Y: 2,
-			},
-			{
-				X: 3,
-				Y: 0,
-			},
-			{
-				X: 3,
-				Y: 1,
-			},
-			{
-				X: 3,
-				Y: 2,
-			},
-		},
-		MapElementSpawn: []Point{
-			{
-				X: 1,
-				Y: 1,
-			},
-		},
-	}
-	assert.Equal(t, expected, gameMap.GetMapElements())
-}
-
 func TestIsWallMethod(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -222,19 +159,19 @@ func TestIsWallMethod(t *testing.T) {
 	}{
 		{
 			name:    "Shouldn't find a wall on this position",
-			gameMap: mapTest1,
+			gameMap: mapTest3,
 			position: Point{
-				X: 1,
-				Y: 1,
+				X: 0,
+				Y: 0,
 			},
 			expected: false,
 		},
 		{
 			name:    "Should find a wall on this position",
-			gameMap: mapTest1,
+			gameMap: mapTest3,
 			position: Point{
-				X: 0,
-				Y: 0,
+				X: -1,
+				Y: -1,
 			},
 			expected: true,
 		},
