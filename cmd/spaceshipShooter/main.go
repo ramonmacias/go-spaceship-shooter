@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/gofrs/uuid"
 	"github.com/ramonmacias/go-spaceship-shooter/internal/game"
 	"github.com/ramonmacias/go-spaceship-shooter/internal/view"
 )
@@ -51,10 +52,24 @@ var MapDefault = [][]rune{
 }
 
 func main() {
-	engine := &game.Engine{
-		GameMap: MapDefault,
+	player := game.Actor{
+		ID:   uuid.Must(uuid.NewV4()),
+		Name: "Ramon",
+		Position: game.Point{
+			X: 0,
+			Y: 0,
+		},
 	}
+	actors := make(map[uuid.UUID]game.Actor)
+	actors[player.ID] = player
+	engine := &game.Engine{
+		GameMap:    MapDefault,
+		Actors:     actors,
+		ActionChan: make(chan game.Action, 1),
+	}
+	engine.Start()
 	userInterface := view.New(engine)
+	userInterface.MainPlayerID = player.ID
 	userInterface.Start()
 
 	err := <-userInterface.ErrChan

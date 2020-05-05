@@ -1,6 +1,7 @@
 package game
 
 import (
+	"log"
 	"sync"
 	"time"
 
@@ -35,7 +36,9 @@ func (e *Engine) Start() {
 // channel and will apply them
 func (e *Engine) actionsListener() {
 	for {
+		log.Println("[DEBUG] Waiting for actions")
 		action := <-e.ActionChan
+		log.Println("[DEBUG] Received action", action)
 		e.Mu.Lock()
 		action.Perform(e)
 		e.Mu.Unlock()
