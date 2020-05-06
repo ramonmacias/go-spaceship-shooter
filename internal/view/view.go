@@ -40,6 +40,11 @@ func New(engine *game.Engine) *UserInterface {
 		ErrChan: make(chan error),
 	}
 	ui.drawViewPort()
+	ui.draw(
+		ui.drawActors(),
+		ui.drawMap(),
+	)
+	ui.setupListeners()
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {
 		case tcell.KeyCtrlC:
@@ -57,11 +62,6 @@ func New(engine *game.Engine) *UserInterface {
 
 // Start will setup the basics and run the game on your terminal
 func (ui *UserInterface) Start() {
-	// ui.drawViewPort()
-	// ui.drawMap()
-	// box = ui.drawActors(box)
-	// ui.setupListeners()
-
 	drawTicker := time.NewTicker(drawFrequency)
 	stop := make(chan bool)
 	go func() {
@@ -94,49 +94,6 @@ func (ui *UserInterface) drawViewPort() {
 		SetTitle("Spaceship Shooter").
 		SetBackgroundColor(backgroundColor)
 
-	box.SetDrawFunc(func(screen tcell.Screen, x int, y int, width int, height int) (int, int, int, int) {
-		ui.Engine.Mu.RLock()
-		defer ui.Engine.Mu.RUnlock()
-		style := tcell.StyleDefault.Background(backgroundColor)
-		// Re visit this center stuff
-		centerX := width / 2
-		centerY := height / 2
-		for _, wall := range ui.Engine.GameMap.GetMapElements()[game.MapElementWall] {
-			x := centerX + wall.X
-			y := centerY + wall.Y
-			screen.SetContent(x, y, '█', nil, style.Foreground(wallColor))
-		}
-		// style := tcell.StyleDefault.Background(backgroundColor)
-		// Re visit this center stuff
-		// centerX := width / 2
-		// centerY := height / 2
-		for _, actor := range ui.Engine.Actors {
-			x := centerX + actor.Position.X
-			y := centerY + actor.Position.Y
-
-			screen.SetContent(x, y, 'A', nil, style.Foreground(playerColor))
-		}
-		return 0, 0, 0, 0
-	})
-	box.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		direction := game.DirectionNone
-		switch event.Key() {
-		case tcell.KeyUp:
-			direction = game.DirectionUp
-		case tcell.KeyDown:
-			direction = game.DirectionDown
-		case tcell.KeyRight:
-			direction = game.DirectionRight
-		case tcell.KeyLeft:
-			direction = game.DirectionLeft
-		}
-		ui.Engine.ActionChan <- &game.MoveAction{
-			ActorID:   ui.MainPlayerID,
-			Direction: direction,
-			CreatedAt: time.Now(),
-		}
-		return event
-	})
 	helpText := tview.NewTextView().
 		SetTextAlign(tview.AlignCenter).
 		SetText("← → ↑ ↓ move - wasd shoot - p score - esc close - ctrl+q quit").
@@ -148,53 +105,6 @@ func (ui *UserInterface) drawViewPort() {
 		AddItem(helpText, 1, 1, false)
 	ui.pages.AddPage("viewport", flex, true, true)
 	ui.viewPort = box
-}
-
-// drawMap will render the game map into your terminal
-func (ui *UserInterface) drawMap() *tview.Box {
-	return ui.viewPort.SetDrawFunc(func(screen tcell.Screen, x int, y int, width int, height int) (int, int, int, int) {
-		ui.Engine.Mu.RLock()
-		defer ui.Engine.Mu.RUnlock()
-		style := tcell.StyleDefault.Background(backgroundColor)
-		// Re visit this center stuff
-		centerX := width / 2
-		centerY := height / 2
-		for _, wall := range ui.Engine.GameMap.GetMapElements()[game.MapElementWall] {
-			x := centerX + wall.X
-			y := centerY + wall.Y
-			screen.SetContent(x, y, '█', nil, style.Foreground(wallColor))
-		}
-		// style := tcell.StyleDefault.Background(backgroundColor)
-		// Re visit this center stuff
-		// centerX := width / 2
-		// centerY := height / 2
-		for _, actor := range ui.Engine.Actors {
-			x := centerX + actor.Position.X
-			y := centerY + actor.Position.Y
-
-			screen.SetContent(x, y, 'A', nil, style.Foreground(playerColor))
-		}
-		return 0, 0, 0, 0
-	})
-}
-
-// drawActors will render all the actors involved on the game
-func (ui *UserInterface) drawActors(box *tview.Box) *tview.Box {
-	return box.SetDrawFunc(func(screen tcell.Screen, x int, y int, width int, height int) (int, int, int, int) {
-		ui.Engine.Mu.RLock()
-		defer ui.Engine.Mu.RUnlock()
-		style := tcell.StyleDefault.Background(backgroundColor)
-		// Re visit this center stuff
-		centerX := width / 2
-		centerY := height / 2
-		for _, actor := range ui.Engine.Actors {
-			x := centerX + actor.Position.X
-			y := centerY + actor.Position.Y
-
-			screen.SetContent(x, y, 'A', nil, style.Foreground(playerColor))
-		}
-		return 0, 0, 0, 0
-	})
 }
 
 // setupListeners will take care of all the inputs we receive from the user
