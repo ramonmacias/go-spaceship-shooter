@@ -63,5 +63,29 @@ type LaserAction struct {
 
 // Perform will execute the specific behaviour for a laser action
 func (l *LaserAction) Perform(e *Engine) {
-	// laser := e.Lasers[l.LaserID]
+	go func(la *LaserAction, en *Engine) {
+		laser := en.Lasers[la.LaserID]
+		ticker := time.NewTicker(5 * time.Second)
+		timer := time.NewTimer(20 * time.Second)
+		for {
+			select {
+			case <-ticker.C:
+				switch la.Direction {
+				case DirectionUp:
+					laser.Position.Y--
+				case DirectionDown:
+					laser.Position.Y++
+				case DirectionRight:
+					laser.Position.X++
+				case DirectionLeft:
+					laser.Position.X--
+				}
+				// Check collisions with wall and also for other actors
+				// Update position to be printed
+			case <-timer.C:
+				return
+			default:
+			}
+		}
+	}(l, e)
 }
