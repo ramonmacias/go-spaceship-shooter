@@ -52,3 +52,16 @@ func (m *MoveAction) Perform(e *Engine) {
 	}
 	e.Actors[m.ActorID] = actor
 }
+
+// LaserAction keep the information about all the lasers actioned by the player
+// or players, and his position and also how long
+type LaserAction struct {
+	LaserID   uuid.UUID
+	Direction Direction
+	CreatedAt time.Time
+}
+
+// Perform will execute the specific behaviour for a laser action
+func (l *LaserAction) Perform(e *Engine) {
+	// laser := e.Lasers[l.LaserID]
+}

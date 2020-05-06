@@ -24,6 +24,8 @@ type Engine struct {
 	WaitForRound    bool
 	IsAuthoritative bool
 	spawnPointIndex int
+	// Lasers keep the information about each lasers on the map
+	Lasers map[uuid.UUID]Laser
 }
 
 // Start will setup the basics for run the game
@@ -48,6 +50,12 @@ func (e *Engine) actionsListener() {
 type Actor struct {
 	ID       uuid.UUID
 	Name     string
+	Position Point
+}
+
+// Laser defines a laser shoot
+type Laser struct {
+	ID       uuid.UUID
 	Position Point
 }
 
