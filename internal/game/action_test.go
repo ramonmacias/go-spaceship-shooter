@@ -65,7 +65,7 @@ func TestMoveActionPerform(t *testing.T) {
 				CreatedAt: time.Now(),
 			},
 			expected: game.Point{
-				X: 1,
+				X: -1,
 				Y: -1,
 			},
 		},
@@ -77,7 +77,7 @@ func TestMoveActionPerform(t *testing.T) {
 				CreatedAt: time.Now(),
 			},
 			expected: game.Point{
-				X: 1,
+				X: -1,
 				Y: 0,
 			},
 		},
