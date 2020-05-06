@@ -15,6 +15,7 @@ const (
 	wallColor       = tcell.Color24
 	playerColor     = tcell.ColorBlue
 	drawFrequency   = 17 * time.Millisecond
+	textColor       = tcell.ColorWhite
 )
 
 // UserInterface will keep the basics for render the game on a terminal and listen
@@ -38,7 +39,7 @@ func New(engine *game.Engine) *UserInterface {
 		pages:   pages,
 		ErrChan: make(chan error),
 	}
-
+	ui.drawViewPort()
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {
 		case tcell.KeyCtrlC:
@@ -56,8 +57,7 @@ func New(engine *game.Engine) *UserInterface {
 
 // Start will setup the basics and run the game on your terminal
 func (ui *UserInterface) Start() {
-	log.Println("[DEBUG] Start user interface")
-	ui.drawViewPort()
+	// ui.drawViewPort()
 	// ui.drawMap()
 	// box = ui.drawActors(box)
 	// ui.setupListeners()
@@ -98,7 +98,6 @@ func (ui *UserInterface) drawViewPort() {
 		ui.Engine.Mu.RLock()
 		defer ui.Engine.Mu.RUnlock()
 		style := tcell.StyleDefault.Background(backgroundColor)
-		log.Println("[DEBUG] Printing map")
 		// Re visit this center stuff
 		centerX := width / 2
 		centerY := height / 2
@@ -120,7 +119,7 @@ func (ui *UserInterface) drawViewPort() {
 		return 0, 0, 0, 0
 	})
 	box.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		var direction game.Direction
+		direction := game.DirectionNone
 		switch event.Key() {
 		case tcell.KeyUp:
 			direction = game.DirectionUp
@@ -131,7 +130,6 @@ func (ui *UserInterface) drawViewPort() {
 		case tcell.KeyLeft:
 			direction = game.DirectionLeft
 		}
-		log.Println("[DEBUG] received movement", direction)
 		ui.Engine.ActionChan <- &game.MoveAction{
 			ActorID:   ui.MainPlayerID,
 			Direction: direction,
@@ -139,10 +137,15 @@ func (ui *UserInterface) drawViewPort() {
 		}
 		return event
 	})
-
+	helpText := tview.NewTextView().
+		SetTextAlign(tview.AlignCenter).
+		SetText("← → ↑ ↓ move - wasd shoot - p score - esc close - ctrl+q quit").
+		SetTextColor(textColor)
+	helpText.SetBackgroundColor(backgroundColor)
 	flex := tview.NewFlex().
 		SetDirection(tview.FlexRow).
-		AddItem(box, 0, 1, true)
+		AddItem(box, 0, 1, true).
+		AddItem(helpText, 1, 1, false)
 	ui.pages.AddPage("viewport", flex, true, true)
 	ui.viewPort = box
 }
@@ -209,7 +212,6 @@ func (ui *UserInterface) setupListeners() {
 		case tcell.KeyLeft:
 			direction = game.DirectionLeft
 		}
-		log.Println("[DEBUG] received movement", direction)
 		ui.Engine.ActionChan <- &game.MoveAction{
 			ActorID:   ui.MainPlayerID,
 			Direction: direction,

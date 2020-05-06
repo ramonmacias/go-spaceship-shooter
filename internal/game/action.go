@@ -16,7 +16,8 @@ type Direction int
 
 // Contains direction constants - DirectionStop will take no effect.
 const (
-	DirectionUp Direction = iota
+	DirectionNone Direction = iota
+	DirectionUp
 	DirectionDown
 	DirectionLeft
 	DirectionRight
@@ -41,9 +42,9 @@ func (m *MoveAction) Perform(e *Engine) {
 	case DirectionDown:
 		actor.Position.Y++
 	case DirectionRight:
-		actor.Position.X--
-	case DirectionLeft:
 		actor.Position.X++
+	case DirectionLeft:
+		actor.Position.X--
 	}
 	// Check if we collide with a wall
 	if e.GameMap.IsWall(actor.Position) {
