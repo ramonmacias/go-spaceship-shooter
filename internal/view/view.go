@@ -14,6 +14,7 @@ const (
 	backgroundColor = tcell.Color234
 	wallColor       = tcell.Color24
 	playerColor     = tcell.ColorBlue
+	laserColor      = tcell.ColorRed
 	drawFrequency   = 17 * time.Millisecond
 	textColor       = tcell.ColorWhite
 )
@@ -43,6 +44,7 @@ func New(engine *game.Engine) *UserInterface {
 	ui.draw(
 		ui.drawActors(),
 		ui.drawMap(),
+		ui.drawLasers(),
 	)
 	ui.setupListeners()
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
@@ -125,6 +127,28 @@ func (ui *UserInterface) setupListeners() {
 		ui.Engine.ActionChan <- &game.MoveAction{
 			ActorID:   ui.MainPlayerID,
 			Direction: direction,
+			CreatedAt: time.Now(),
+		}
+
+		var laserDirection game.Direction
+		switch event.Rune() {
+		case 'w':
+			laserDirection = game.DirectionUp
+		case 'd':
+			laserDirection = game.DirectionRight
+		case 's':
+			laserDirection = game.DirectionDown
+		case 'a':
+			laserDirection = game.DirectionLeft
+		}
+		laserID := uuid.Must(uuid.NewV4())
+		ui.Engine.Lasers.Store(laserID, game.Laser{
+			ID:       laserID,
+			Position: ui.Engine.Actors[ui.MainPlayerID].Position,
+		})
+		ui.Engine.ActionChan <- &game.LaserAction{
+			LaserID:   laserID,
+			Direction: laserDirection,
 			CreatedAt: time.Now(),
 		}
 		return event

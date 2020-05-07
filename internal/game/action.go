@@ -64,9 +64,10 @@ type LaserAction struct {
 // Perform will execute the specific behaviour for a laser action
 func (l *LaserAction) Perform(e *Engine) {
 	go func(la *LaserAction, en *Engine) {
-		laser := en.Lasers[la.LaserID]
-		ticker := time.NewTicker(5 * time.Second)
-		timer := time.NewTimer(20 * time.Second)
+		las, _ := en.Lasers.Load(la.LaserID)
+		laser := las.(Laser)
+		ticker := time.NewTicker(5 * time.Millisecond)
+		// timer := time.NewTimer(20 * time.Second)
 		for {
 			select {
 			case <-ticker.C:
@@ -81,9 +82,15 @@ func (l *LaserAction) Perform(e *Engine) {
 					laser.Position.X--
 				}
 				// Check collisions with wall and also for other actors
+				if e.GameMap.IsWall(laser.Position) {
+					e.Lasers.Delete(l.LaserID)
+					return
+				}
 				// Update position to be printed
-			case <-timer.C:
-				return
+				e.Lasers.Store(l.LaserID, laser)
+			// case <-timer.C:
+			// 	delete(e.Lasers, l.LaserID)
+			// 	return
 			default:
 			}
 		}

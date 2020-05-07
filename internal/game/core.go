@@ -25,7 +25,7 @@ type Engine struct {
 	IsAuthoritative bool
 	spawnPointIndex int
 	// Lasers keep the information about each lasers on the map
-	Lasers map[uuid.UUID]Laser
+	Lasers sync.Map
 }
 
 // Start will setup the basics for run the game

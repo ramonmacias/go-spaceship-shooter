@@ -54,3 +54,24 @@ func (ui *UserInterface) drawActors() drawFunc {
 		return 0, 0, 0, 0
 	})
 }
+
+// drawLasers will render all the active lasers
+func (ui *UserInterface) drawLasers() drawFunc {
+	return drawFunc(func(screen tcell.Screen, x int, y int, width int, height int) (int, int, int, int) {
+		ui.Engine.Mu.RLock()
+		defer ui.Engine.Mu.RUnlock()
+		style := tcell.StyleDefault.Background(backgroundColor)
+		// Re visit this center stuff
+		centerX := width / 2
+		centerY := height / 2
+		ui.Engine.Lasers.Range(func(laserID interface{}, la interface{}) bool {
+			laser := la.(game.Laser)
+			x := centerX + laser.Position.X
+			y := centerY + laser.Position.Y
+
+			screen.SetContent(x, y, 'X', nil, style.Foreground(laserColor))
+			return true
+		})
+		return 0, 0, 0, 0
+	})
+}
