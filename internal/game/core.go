@@ -15,7 +15,6 @@ type Engine struct {
 	// GameMap keep link to the current map is playing
 	GameMap         Map
 	Mu              sync.RWMutex
-	ChangeChan      chan Change
 	ActionChan      chan Action
 	lastAction      map[string]time.Time
 	Score           map[uuid.UUID]int
@@ -57,27 +56,4 @@ type Actor struct {
 type Laser struct {
 	ID       uuid.UUID
 	Position Point
-}
-
-// Identifier is an entity that provides an ID method.
-type Identifier interface {
-	ID() uuid.UUID
-}
-
-// Change is sent by the game engine in response to Actions.
-// TODO review this part
-type Change interface{}
-
-// MoveChange this is a result change from an user action
-type MoveChange struct {
-	Change
-	Entity    Identifier
-	Direction Direction
-	Position  Point
-}
-
-// AddEntityChange change for resulting behaviour in other entities
-type AddEntityChange struct {
-	Change
-	Entity Identifier
 }
