@@ -73,6 +73,7 @@ func (ui *UserInterface) Start() {
 			select {
 			case <-stop:
 				return
+			default:
 			}
 		}
 	}()
@@ -85,6 +86,7 @@ func (ui *UserInterface) Start() {
 		drawTicker.Stop()
 		select {
 		case ui.ErrChan <- err:
+		default:
 		}
 	}()
 }
@@ -124,12 +126,13 @@ func (ui *UserInterface) setupListeners() {
 		case tcell.KeyLeft:
 			direction = game.DirectionLeft
 		}
-		ui.Engine.ActionChan <- &game.MoveAction{
-			ActorID:   ui.MainPlayerID,
-			Direction: direction,
-			CreatedAt: time.Now(),
+		if direction != game.DirectionNone {
+			ui.Engine.ActionChan <- &game.MoveAction{
+				ActorID:   ui.MainPlayerID,
+				Direction: direction,
+				CreatedAt: time.Now(),
+			}
 		}
-
 		var laserDirection game.Direction
 		switch event.Rune() {
 		case 'w':
@@ -141,15 +144,17 @@ func (ui *UserInterface) setupListeners() {
 		case 'a':
 			laserDirection = game.DirectionLeft
 		}
-		laserID := uuid.Must(uuid.NewV4())
-		ui.Engine.Lasers.Store(laserID, game.Laser{
-			ID:       laserID,
-			Position: ui.Engine.Actors[ui.MainPlayerID].Position,
-		})
-		ui.Engine.ActionChan <- &game.LaserAction{
-			LaserID:   laserID,
-			Direction: laserDirection,
-			CreatedAt: time.Now(),
+		if laserDirection != game.DirectionNone {
+			laserID := uuid.Must(uuid.NewV4())
+			ui.Engine.Lasers.Store(laserID, game.Laser{
+				ID:       laserID,
+				Position: ui.Engine.Actors[ui.MainPlayerID].Position,
+			})
+			ui.Engine.ActionChan <- &game.LaserAction{
+				LaserID:   laserID,
+				Direction: laserDirection,
+				CreatedAt: time.Now(),
+			}
 		}
 		return event
 	})

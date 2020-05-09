@@ -21,7 +21,6 @@ const (
 	DirectionDown
 	DirectionLeft
 	DirectionRight
-	DirectionStop
 )
 
 // MoveAction keep the information about the actions launched by the user, such
@@ -66,7 +65,7 @@ func (l *LaserAction) Perform(e *Engine) {
 	go func(la *LaserAction, en *Engine) {
 		las, _ := en.Lasers.Load(la.LaserID)
 		laser := las.(Laser)
-		ticker := time.NewTicker(5 * time.Millisecond)
+		ticker := time.NewTicker(18 * time.Millisecond)
 		// timer := time.NewTimer(20 * time.Second)
 		for {
 			select {
