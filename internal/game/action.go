@@ -60,13 +60,14 @@ type LaserAction struct {
 	CreatedAt time.Time
 }
 
-// Perform will execute the specific behaviour for a laser action
+// Perform will execute the specific behaviour for a laser action, which is
+// move until it collide with something, once we collide the perform will
+// take the specific reactions
 func (l *LaserAction) Perform(e *Engine) {
 	go func(la *LaserAction, en *Engine) {
 		las, _ := en.Lasers.Load(la.LaserID)
 		laser := las.(Laser)
 		ticker := time.NewTicker(18 * time.Millisecond)
-		// timer := time.NewTimer(20 * time.Second)
 		for {
 			select {
 			case <-ticker.C:
@@ -85,11 +86,12 @@ func (l *LaserAction) Perform(e *Engine) {
 					e.Lasers.Delete(l.LaserID)
 					return
 				}
+				if e.checkLaserCollisions(laser.Position) {
+					e.Lasers.Delete(l.LaserID)
+					return
+				}
 				// Update position to be printed
 				e.Lasers.Store(l.LaserID, laser)
-			// case <-timer.C:
-			// 	delete(e.Lasers, l.LaserID)
-			// 	return
 			default:
 			}
 		}

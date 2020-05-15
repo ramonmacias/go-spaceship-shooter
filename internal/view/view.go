@@ -11,12 +11,7 @@ import (
 )
 
 const (
-	backgroundColor = tcell.Color234
-	wallColor       = tcell.Color24
-	playerColor     = tcell.ColorBlue
-	laserColor      = tcell.ColorRed
-	drawFrequency   = 17 * time.Millisecond
-	textColor       = tcell.ColorWhite
+	drawFrequency = 17 * time.Millisecond
 )
 
 // UserInterface will keep the basics for render the game on a terminal and listen
@@ -42,6 +37,7 @@ func New(engine *game.Engine) *UserInterface {
 	}
 	ui.drawViewPort()
 	ui.draw(
+		ui.drawBots(),
 		ui.drawActors(),
 		ui.drawMap(),
 		ui.drawLasers(),

@@ -5,6 +5,15 @@ import (
 	"github.com/ramonmacias/go-spaceship-shooter/internal/game"
 )
 
+const (
+	backgroundColor = tcell.Color234
+	wallColor       = tcell.Color24
+	playerColor     = tcell.ColorBlue
+	laserColor      = tcell.ColorRed
+	textColor       = tcell.ColorWhite
+	botColor        = tcell.ColorMediumAquamarine
+)
+
 type drawFunc func(screen tcell.Screen, x int, y int, width int, height int) (int, int, int, int)
 
 // draw method will receive a variadric of draw funcs and will apply each one
@@ -72,6 +81,25 @@ func (ui *UserInterface) drawLasers() drawFunc {
 			screen.SetContent(x, y, 'X', nil, style.Foreground(laserColor))
 			return true
 		})
+		return 0, 0, 0, 0
+	})
+}
+
+// drawBots will render all the active bots
+func (ui *UserInterface) drawBots() drawFunc {
+	return drawFunc(func(screen tcell.Screen, x int, y int, width int, height int) (int, int, int, int) {
+		ui.Engine.Mu.RLock()
+		defer ui.Engine.Mu.RUnlock()
+		style := tcell.StyleDefault.Background(backgroundColor)
+		// Re visit this center stuff
+		centerX := width / 2
+		centerY := height / 2
+		for _, bot := range ui.Engine.Bots {
+			x := centerX + bot.Position.X
+			y := centerY + bot.Position.Y
+
+			screen.SetContent(x, y, 'Y', nil, style.Foreground(botColor))
+		}
 		return 0, 0, 0, 0
 	})
 }
