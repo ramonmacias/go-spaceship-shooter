@@ -50,6 +50,7 @@ func NewEngine(opts ...engineOpt) *Engine {
 // Start will setup the basics for run the game
 func (e *Engine) Start() {
 	go e.actionsListener()
+	e.startBots()
 }
 
 // SetMap will attach the given map to the game engine

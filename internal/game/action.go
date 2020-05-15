@@ -1,6 +1,7 @@
 package game
 
 import (
+	"math/rand"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -22,6 +23,12 @@ const (
 	DirectionLeft
 	DirectionRight
 )
+
+// RandomDirection will get a random direction
+func RandomDirection() Direction {
+	rn := rand.Intn(5)
+	return Direction(rn)
+}
 
 // MoveAction keep the information about the actions launched by the user, such
 // as arrow keys pressed, an action is a definition of a movement applied to an
@@ -50,6 +57,35 @@ func (m *MoveAction) Perform(e *Engine) {
 		return
 	}
 	e.Actors[m.ActorID] = actor
+}
+
+// BotMoveAction defines the concept of movement for the bots
+// TODO merge this with the MoveAction, the Actor can be an interface and share
+// a common mover interface
+type BotMoveAction struct {
+	BotID     uuid.UUID
+	Direction Direction
+	CreatedAt time.Time
+}
+
+// Perform will execute the behaviour linked to a bot move action
+func (m *BotMoveAction) Perform(e *Engine) {
+	bot := e.Bots[m.BotID]
+	switch m.Direction {
+	case DirectionUp:
+		bot.Position.Y--
+	case DirectionDown:
+		bot.Position.Y++
+	case DirectionRight:
+		bot.Position.X++
+	case DirectionLeft:
+		bot.Position.X--
+	}
+	// Check if we collide with a wall
+	if e.GameMap.IsWall(bot.Position) {
+		return
+	}
+	e.Bots[m.BotID] = bot
 }
 
 // LaserAction keep the information about all the lasers actioned by the player
