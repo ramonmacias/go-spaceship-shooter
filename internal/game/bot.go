@@ -76,5 +76,21 @@ func (s BotStrategy) perform(e *Engine, bot Bot) {
 			default:
 			}
 		}
+	case OnlyShootingStrategy:
+		ticker := time.NewTicker(300 * time.Millisecond)
+		for {
+			if _, exists := e.Bots.Load(bot.ID); !exists {
+				return
+			}
+			select {
+			case <-ticker.C:
+				e.ActionChan <- &LaserAction{
+					LaserID:   uuid.Must(uuid.NewV4()),
+					Direction: RandomDirection(),
+					CreatedAt: time.Now(),
+				}
+			default:
+			}
+		}
 	}
 }
