@@ -99,6 +99,7 @@ func (e *Engine) checkLaserCollisions(laserPosition Point) (collide bool) {
 		}
 		return true
 	})
+	// We can't remove a key value on a ranging map
 	if botToDelete != uuid.Nil {
 		e.Bots.Delete(botToDelete)
 	}
