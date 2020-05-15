@@ -94,12 +94,14 @@ func (ui *UserInterface) drawBots() drawFunc {
 		// Re visit this center stuff
 		centerX := width / 2
 		centerY := height / 2
-		for _, bot := range ui.Engine.Bots {
+		ui.Engine.Bots.Range(func(botID interface{}, value interface{}) bool {
+			bot := value.(game.Bot)
 			x := centerX + bot.Position.X
 			y := centerY + bot.Position.Y
 
 			screen.SetContent(x, y, 'Y', nil, style.Foreground(botColor))
-		}
+			return true
+		})
 		return 0, 0, 0, 0
 	})
 }

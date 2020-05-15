@@ -35,15 +35,14 @@ type Bot struct {
 // spawn position
 func SetBots() engineOpt {
 	return func(e *Engine) error {
-		e.Bots = make(map[uuid.UUID]Bot)
 		for _, spawnPosition := range e.GameMap.GetMapElements()[MapElementSpawn] {
 			botID := uuid.Must(uuid.NewV4())
-			e.Bots[botID] = Bot{
+			e.Bots.Store(botID, Bot{
 				ID:       botID,
 				Life:     4,
 				Position: spawnPosition,
 				Strategy: OnlyMovementStrategy,
-			}
+			})
 		}
 		return nil
 	}
@@ -51,9 +50,11 @@ func SetBots() engineOpt {
 
 // startBots will apply all the strategies linked to each bot
 func (e *Engine) startBots() {
-	for _, bot := range e.Bots {
+	e.Bots.Range(func(key interface{}, value interface{}) bool {
+		bot := value.(Bot)
 		go bot.Strategy.perform(e, bot)
-	}
+		return true
+	})
 }
 
 // perform will execute the behaviour linked to the given strategy
@@ -62,11 +63,9 @@ func (s BotStrategy) perform(e *Engine, bot Bot) {
 	case OnlyMovementStrategy:
 		ticker := time.NewTicker(200 * time.Millisecond)
 		for {
-			e.Mu.Lock()
-			if _, ok := e.Bots[bot.ID]; !ok {
+			if _, exists := e.Bots.Load(bot.ID); !exists {
 				return
 			}
-			e.Mu.Unlock()
 			select {
 			case <-ticker.C:
 				e.ActionChan <- &BotMoveAction{

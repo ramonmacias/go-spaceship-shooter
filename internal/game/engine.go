@@ -31,7 +31,7 @@ type Engine struct {
 	// Lasers keep the information about each lasers on the map
 	Lasers sync.Map
 	// Bots keep the information about bots on the map
-	Bots map[uuid.UUID]Bot
+	Bots sync.Map
 }
 
 // NewEngine function will build a new engine with the applied engine options
@@ -83,21 +83,26 @@ func (e *Engine) actionsListener() {
 // checkCollisions will check if there is some bot on the given laser position
 // if it is will reduce the life and remove the bot if needed and return true,
 // otherwise do nothing and return false
-func (e *Engine) checkLaserCollisions(laserPosition Point) bool {
-	e.Mu.Lock()
-	defer e.Mu.Unlock()
-
-	for botID, bot := range e.Bots {
+func (e *Engine) checkLaserCollisions(laserPosition Point) (collide bool) {
+	botToDelete := uuid.Nil
+	e.Bots.Range(func(key interface{}, value interface{}) bool {
+		bot := value.(Bot)
+		botID := key.(uuid.UUID)
 		if bot.Position.Equal(laserPosition) {
 			bot.Life--
-			e.Bots[botID] = bot
+			e.Bots.Store(botID, bot)
 			if bot.Life == 0 {
-				delete(e.Bots, botID)
+				botToDelete = botID
 			}
-			return true
+			collide = true
+			return false
 		}
+		return true
+	})
+	if botToDelete != uuid.Nil {
+		e.Bots.Delete(botToDelete)
 	}
-	return false
+	return collide
 }
 
 // Actor defines all the different entities that has the feature of change the

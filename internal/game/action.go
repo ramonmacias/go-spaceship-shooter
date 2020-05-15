@@ -70,7 +70,11 @@ type BotMoveAction struct {
 
 // Perform will execute the behaviour linked to a bot move action
 func (m *BotMoveAction) Perform(e *Engine) {
-	bot := e.Bots[m.BotID]
+	val, exists := e.Bots.Load(m.BotID)
+	if !exists {
+		return
+	}
+	bot := val.(Bot)
 	switch m.Direction {
 	case DirectionUp:
 		bot.Position.Y--
@@ -85,7 +89,7 @@ func (m *BotMoveAction) Perform(e *Engine) {
 	if e.GameMap.IsWall(bot.Position) {
 		return
 	}
-	e.Bots[m.BotID] = bot
+	e.Bots.Store(m.BotID, bot)
 }
 
 // LaserAction keep the information about all the lasers actioned by the player
