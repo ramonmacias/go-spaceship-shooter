@@ -126,7 +126,7 @@ func (l *LaserAction) Perform(e *Engine) {
 					e.Lasers.Delete(l.LaserID)
 					return
 				}
-				if e.checkLaserCollisions(laser.Position) {
+				if e.checkLaserCollisions(laser.Position, laser.Origin) {
 					e.Lasers.Delete(l.LaserID)
 					return
 				}

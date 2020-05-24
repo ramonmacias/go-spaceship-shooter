@@ -145,6 +145,7 @@ func (ui *UserInterface) setupListeners() {
 			ui.Engine.Lasers.Store(laserID, game.Laser{
 				ID:       laserID,
 				Position: ui.Engine.Actors[ui.MainPlayerID].Position,
+				Origin:   game.OriginPlayer,
 			})
 			ui.Engine.ActionChan <- &game.LaserAction{
 				LaserID:   laserID,

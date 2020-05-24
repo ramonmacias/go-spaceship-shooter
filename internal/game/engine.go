@@ -37,7 +37,7 @@ type Engine struct {
 // NewEngine function will build a new engine with the applied engine options
 func NewEngine(opts ...engineOpt) *Engine {
 	e := &Engine{
-		ActionChan: make(chan Action, 1),
+		ActionChan: make(chan Action, 100),
 	}
 	for _, fn := range opts {
 		if err := fn(e); err != nil {
@@ -83,25 +83,28 @@ func (e *Engine) actionsListener() {
 // checkCollisions will check if there is some bot on the given laser position
 // if it is will reduce the life and remove the bot if needed and return true,
 // otherwise do nothing and return false
-func (e *Engine) checkLaserCollisions(laserPosition Point) (collide bool) {
-	botToDelete := uuid.Nil
-	e.Bots.Range(func(key interface{}, value interface{}) bool {
-		bot := value.(Bot)
-		botID := key.(uuid.UUID)
-		if bot.Position.Equal(laserPosition) {
-			bot.Life--
-			e.Bots.Store(botID, bot)
-			if bot.Life == 0 {
-				botToDelete = botID
+func (e *Engine) checkLaserCollisions(laserPosition Point, origin Origin) (collide bool) {
+	// TODO refacor this, each actor should his own check collider
+	if origin != OriginBot {
+		botToDelete := uuid.Nil
+		e.Bots.Range(func(key interface{}, value interface{}) bool {
+			bot := value.(Bot)
+			botID := key.(uuid.UUID)
+			if bot.Position.Equal(laserPosition) {
+				bot.Life--
+				e.Bots.Store(botID, bot)
+				if bot.Life == 0 {
+					botToDelete = botID
+				}
+				collide = true
+				return false
 			}
-			collide = true
-			return false
+			return true
+		})
+		// We can't remove a key value on a ranging map
+		if botToDelete != uuid.Nil {
+			e.Bots.Delete(botToDelete)
 		}
-		return true
-	})
-	// We can't remove a key value on a ranging map
-	if botToDelete != uuid.Nil {
-		e.Bots.Delete(botToDelete)
 	}
 	return collide
 }
@@ -112,11 +115,5 @@ func (e *Engine) checkLaserCollisions(laserPosition Point) (collide bool) {
 type Actor struct {
 	ID       uuid.UUID
 	Name     string
-	Position Point
-}
-
-// Laser defines a laser shoot
-type Laser struct {
-	ID       uuid.UUID
 	Position Point
 }

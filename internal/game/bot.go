@@ -35,14 +35,23 @@ type Bot struct {
 // spawn position
 func SetBots() engineOpt {
 	return func(e *Engine) error {
-		for _, spawnPosition := range e.GameMap.GetMapElements()[MapElementSpawn] {
+		for index, spawnPosition := range e.GameMap.GetMapElements()[MapElementSpawn] {
 			botID := uuid.Must(uuid.NewV4())
-			e.Bots.Store(botID, Bot{
-				ID:       botID,
-				Life:     4,
-				Position: spawnPosition,
-				Strategy: OnlyMovementStrategy,
-			})
+			if index == 0 {
+				e.Bots.Store(botID, Bot{
+					ID:       botID,
+					Life:     4,
+					Position: spawnPosition,
+					Strategy: OnlyShootingStrategy,
+				})
+			} else {
+				e.Bots.Store(botID, Bot{
+					ID:       botID,
+					Life:     4,
+					Position: spawnPosition,
+					Strategy: OnlyMovementStrategy,
+				})
+			}
 		}
 		return nil
 	}
@@ -79,13 +88,21 @@ func (s BotStrategy) perform(e *Engine, bot Bot) {
 	case OnlyShootingStrategy:
 		ticker := time.NewTicker(300 * time.Millisecond)
 		for {
-			if _, exists := e.Bots.Load(bot.ID); !exists {
+			b, exists := e.Bots.Load(bot.ID)
+			if !exists {
 				return
 			}
+			bot := b.(Bot)
 			select {
 			case <-ticker.C:
+				laserID := uuid.Must(uuid.NewV4())
+				e.Lasers.Store(laserID, Laser{
+					ID:       laserID,
+					Position: bot.Position,
+					Origin:   OriginBot,
+				})
 				e.ActionChan <- &LaserAction{
-					LaserID:   uuid.Must(uuid.NewV4()),
+					LaserID:   laserID,
 					Direction: RandomDirection(),
 					CreatedAt: time.Now(),
 				}
