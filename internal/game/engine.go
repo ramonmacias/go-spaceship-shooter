@@ -18,15 +18,17 @@ type Engine struct {
 	// game
 	Actors map[uuid.UUID]Actor
 	// GameMap keep link to the current map is playing
-	GameMap         Map
-	Mu              sync.RWMutex
-	ActionChan      chan Action
-	lastAction      map[string]time.Time
+	GameMap Map
+	Mu      sync.RWMutex
+	// ActionChan is a buffered channel used for comunication between view and the
+	// engine
+	ActionChan chan Action
+	// Score keep the info related with points and actors
 	Score           map[uuid.UUID]int
 	NewRoundAt      time.Time
 	RoundWinner     uuid.UUID
-	WaitForRound    bool
-	IsAuthoritative bool
+	LevelComplete   bool
+	GameOver        bool
 	spawnPointIndex int
 	// Lasers keep the information about each lasers on the map
 	Lasers sync.Map
@@ -38,6 +40,7 @@ type Engine struct {
 func NewEngine(opts ...engineOpt) *Engine {
 	e := &Engine{
 		ActionChan: make(chan Action, 100),
+		Score:      make(map[uuid.UUID]int),
 	}
 	for _, fn := range opts {
 		if err := fn(e); err != nil {
@@ -84,7 +87,7 @@ func (e *Engine) actionsListener() {
 // if it is will reduce the life and remove the bot if needed and return true,
 // otherwise do nothing and return false
 func (e *Engine) checkLaserCollisions(laserPosition Point, origin Origin) (collide bool) {
-	// TODO refacor this, each actor should his own check collider
+	// TODO refacor this, each actor should has his own check collider
 	if origin != OriginBot {
 		botToDelete := uuid.Nil
 		e.Bots.Range(func(key interface{}, value interface{}) bool {
@@ -107,6 +110,15 @@ func (e *Engine) checkLaserCollisions(laserPosition Point, origin Origin) (colli
 		}
 	}
 	return collide
+}
+
+// updateScores will update the global scores.
+// TODO refactor this, now we only have one player, but in case we have multiple
+// we will need to receive at least the actorID
+func (e *Engine) updateScores() {
+	for actorID := range e.Actors {
+		e.Score[actorID] += 10
+	}
 }
 
 // Actor defines all the different entities that has the feature of change the

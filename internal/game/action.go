@@ -128,6 +128,7 @@ func (l *LaserAction) Perform(e *Engine) {
 				}
 				if e.checkLaserCollisions(laser.Position, laser.Origin) {
 					e.Lasers.Delete(l.LaserID)
+					e.updateScores()
 					return
 				}
 				// Update position to be printed

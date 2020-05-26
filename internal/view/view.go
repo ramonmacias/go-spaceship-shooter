@@ -17,12 +17,13 @@ const (
 // UserInterface will keep the basics for render the game on a terminal and listen
 // for all the interacionts from the user
 type UserInterface struct {
-	Engine       *game.Engine
-	App          *tview.Application
-	ErrChan      chan error
-	pages        *tview.Pages
-	viewPort     *tview.Box
-	MainPlayerID uuid.UUID
+	Engine        *game.Engine
+	App           *tview.Application
+	ErrChan       chan error
+	pages         *tview.Pages
+	viewPort      *tview.Box
+	drawCallbacks []func()
+	MainPlayerID  uuid.UUID
 }
 
 // New function will build a new View with the basics intialized
@@ -42,9 +43,20 @@ func New(engine *game.Engine) *UserInterface {
 		ui.drawMap(),
 		ui.drawLasers(),
 	)
+	ui.setupDrawCallbacks(
+		ui.setupScore(),
+		ui.setupLevelComplete(),
+		ui.setupGameOver(),
+	)
 	ui.setupListeners()
 	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		if event.Rune() == 'p' {
+			pages.ShowPage("score")
+		}
 		switch event.Key() {
+		case tcell.KeyEsc:
+			pages.HidePage("score")
+			app.SetFocus(ui.viewPort)
 		case tcell.KeyCtrlC:
 			app.Stop()
 			select {
@@ -64,6 +76,9 @@ func (ui *UserInterface) Start() {
 	stop := make(chan bool)
 	go func() {
 		for {
+			for _, callback := range ui.drawCallbacks {
+				ui.App.QueueUpdate(callback)
+			}
 			ui.App.Draw()
 			<-drawTicker.C
 			select {
