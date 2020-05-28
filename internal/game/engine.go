@@ -88,7 +88,8 @@ func (e *Engine) actionsListener() {
 // otherwise do nothing and return false
 func (e *Engine) checkLaserCollisions(laserPosition Point, origin Origin) (collide bool) {
 	// TODO refacor this, each actor should has his own check collider
-	if origin != OriginBot {
+	switch origin {
+	case OriginPlayer:
 		botToDelete := uuid.Nil
 		e.Bots.Range(func(key interface{}, value interface{}) bool {
 			bot := value.(Bot)
@@ -107,6 +108,18 @@ func (e *Engine) checkLaserCollisions(laserPosition Point, origin Origin) (colli
 		// We can't remove a key value on a ranging map
 		if botToDelete != uuid.Nil {
 			e.Bots.Delete(botToDelete)
+			e.LevelComplete = e.botCount() == 0
+		}
+	case OriginBot:
+		for actorID, actor := range e.Actors {
+			if actor.Position.Equal(laserPosition) {
+				collide = true
+				actor.Life--
+				e.Actors[actorID] = actor
+				if actor.Life <= 0 && !e.GameOver {
+					e.GameOver = true
+				}
+			}
 		}
 	}
 	return collide
@@ -128,4 +141,5 @@ type Actor struct {
 	ID       uuid.UUID
 	Name     string
 	Position Point
+	Life     int
 }

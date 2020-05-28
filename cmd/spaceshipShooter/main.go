@@ -59,13 +59,17 @@ func main() {
 			X: 0,
 			Y: 0,
 		},
+		Life: 3,
 	}
 	actors := make(map[uuid.UUID]game.Actor)
 	actors[player.ID] = player
 	engine := game.NewEngine(
 		game.SetMap(MapDefault),
 		game.SetActors(actors),
-		game.SetBots(),
+		game.SetBots([]game.BotStrategy{
+			game.NoMovementStrategy, game.NoMovementStrategy, game.NoMovementStrategy, game.NoMovementStrategy,
+			game.NoMovementStrategy, game.NoMovementStrategy, game.NoMovementStrategy, game.NoMovementStrategy,
+		}),
 	)
 	engine.Start()
 	userInterface := view.New(engine)

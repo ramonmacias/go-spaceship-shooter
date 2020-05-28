@@ -38,10 +38,10 @@ func New(engine *game.Engine) *UserInterface {
 	}
 	ui.drawViewPort()
 	ui.draw(
+		ui.drawLasers(),
 		ui.drawBots(),
 		ui.drawActors(),
 		ui.drawMap(),
-		ui.drawLasers(),
 	)
 	ui.setupDrawCallbacks(
 		ui.setupScore(),
@@ -111,7 +111,7 @@ func (ui *UserInterface) drawViewPort() {
 
 	helpText := tview.NewTextView().
 		SetTextAlign(tview.AlignCenter).
-		SetText("← → ↑ ↓ move - wasd shoot - p score - esc close - ctrl+q quit").
+		SetText("← → ↑ ↓ move - wasd shoot - p score - esc close - ctrl+c quit").
 		SetTextColor(textColor)
 	helpText.SetBackgroundColor(backgroundColor)
 	flex := tview.NewFlex().
