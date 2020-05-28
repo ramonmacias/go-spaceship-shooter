@@ -26,7 +26,7 @@ const (
 
 // RandomDirection will get a random direction
 func RandomDirection() Direction {
-	rn := rand.Intn(5)
+	rn := rand.Intn(5-1) + 1
 	return Direction(rn)
 }
 

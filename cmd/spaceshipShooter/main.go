@@ -68,7 +68,7 @@ func main() {
 		game.SetActors(actors),
 		game.SetBots([]game.BotStrategy{
 			game.NoMovementStrategy, game.NoMovementStrategy, game.NoMovementStrategy, game.NoMovementStrategy,
-			game.NoMovementStrategy, game.NoMovementStrategy, game.NoMovementStrategy, game.NoMovementStrategy,
+			game.NoMovementStrategy, game.NoMovementStrategy, game.ShootAndMoveStrategy, game.NoMovementStrategy,
 		}),
 	)
 	engine.Start()
