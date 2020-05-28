@@ -24,7 +24,7 @@ const (
 	DirectionRight
 )
 
-// RandomDirection will get a random direction
+// RandomDirection will get a random direction avoiding DirectionNone
 func RandomDirection() Direction {
 	rn := rand.Intn(5-1) + 1
 	return Direction(rn)
