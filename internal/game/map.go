@@ -38,6 +38,14 @@ func (m Map) GetMapElements() map[MapElement][]Point {
 	return elements
 }
 
+// SetMap will attach the given map to the game engine
+func SetMap(m Map) engineOpt {
+	return func(e *Engine) error {
+		e.GameMap = m
+		return nil
+	}
+}
+
 // IsWall will check if on the given position exists a wall
 func (m Map) IsWall(p Point) bool {
 	for _, position := range m.GetMapElements()[MapElementWall] {

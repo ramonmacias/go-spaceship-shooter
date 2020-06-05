@@ -42,8 +42,6 @@ func (ui *UserInterface) setupDrawCallbacks(callbacks ...drawCallback) {
 // drawMap will render the game map into your terminal
 func (ui *UserInterface) drawMap() drawFunc {
 	return drawFunc(func(screen tcell.Screen, x int, y int, width int, height int) (int, int, int, int) {
-		ui.Engine.Mu.RLock()
-		defer ui.Engine.Mu.RUnlock()
 		style := tcell.StyleDefault.Background(backgroundColor)
 		// Re visit this center stuff
 		centerX := width / 2
@@ -60,8 +58,6 @@ func (ui *UserInterface) drawMap() drawFunc {
 // drawActors will render all the actors involved on the game
 func (ui *UserInterface) drawActors() drawFunc {
 	return drawFunc(func(screen tcell.Screen, x int, y int, width int, height int) (int, int, int, int) {
-		ui.Engine.Mu.RLock()
-		defer ui.Engine.Mu.RUnlock()
 		style := tcell.StyleDefault.Background(backgroundColor)
 		// Re visit this center stuff
 		centerX := width / 2
@@ -79,8 +75,6 @@ func (ui *UserInterface) drawActors() drawFunc {
 // drawLasers will render all the active lasers
 func (ui *UserInterface) drawLasers() drawFunc {
 	return drawFunc(func(screen tcell.Screen, x int, y int, width int, height int) (int, int, int, int) {
-		ui.Engine.Mu.RLock()
-		defer ui.Engine.Mu.RUnlock()
 		style := tcell.StyleDefault.Background(backgroundColor)
 		// Re visit this center stuff
 		centerX := width / 2
@@ -100,8 +94,6 @@ func (ui *UserInterface) drawLasers() drawFunc {
 // drawBots will render all the active bots
 func (ui *UserInterface) drawBots() drawFunc {
 	return drawFunc(func(screen tcell.Screen, x int, y int, width int, height int) (int, int, int, int) {
-		ui.Engine.Mu.RLock()
-		defer ui.Engine.Mu.RUnlock()
 		style := tcell.StyleDefault.Background(backgroundColor)
 		// Re visit this center stuff
 		centerX := width / 2
@@ -125,8 +117,6 @@ func (ui *UserInterface) setupScore() drawCallback {
 	modal := centeredModal(tv)
 	ui.pages.AddPage("score", modal, true, false)
 	return func() {
-		ui.Engine.Mu.RLock()
-		defer ui.Engine.Mu.RUnlock()
 		var text string
 		for actorID, actor := range ui.Engine.Actors {
 			score := ui.Engine.Score[actorID]
@@ -148,8 +138,6 @@ func (ui *UserInterface) setupLevelComplete() drawCallback {
 	modal := centeredModal(tv)
 	ui.pages.AddPage("levelComplete", modal, true, false)
 	return func() {
-		ui.Engine.Mu.RLock()
-		defer ui.Engine.Mu.RUnlock()
 		if ui.Engine.LevelComplete {
 			ui.pages.ShowPage("levelComplete")
 			player := ui.Engine.Actors[ui.Engine.RoundWinner]
@@ -170,8 +158,6 @@ func (ui *UserInterface) setupGameOver() drawCallback {
 	modal := centeredModal(tv)
 	ui.pages.AddPage("gameOver", modal, true, false)
 	return func() {
-		ui.Engine.Mu.RLock()
-		defer ui.Engine.Mu.RUnlock()
 		if ui.Engine.GameOver {
 			ui.pages.ShowPage("gameOver")
 			text := "\nThis is the end of your adventure, try again\n\n"
