@@ -1,5 +1,7 @@
 # go-spaceship-shooter
 
+blog https://ramonmacias.github.io/2020/06/27/spaceship-shooter/
+
 One of my motivations when I started my studies on computer engineering were the videogames, understand the logic that moves each game under the roof. With this project I'm trying to learn some game basics as well practice some parts of the Go language that I didn't use to use every day. I took as an inspiration this blog https://mortenson.coffee/blog/making-multiplayer-game-go-and-grpc/ and try to do a similar game but on my own way.
 
 ## Description
